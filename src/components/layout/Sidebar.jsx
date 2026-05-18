@@ -5,169 +5,141 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
-
-import { motion } from "framer-motion";
-
-import {
-  useChatContext,
-} from "../../context/ChatContext";
-
-import {
-  useAuth,
-} from "../../context/AuthContext";
+import { motion, AnimatePresence } from "framer-motion";
+import { useChatContext } from "../../context/ChatContext";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Sidebar() {
-
-  const {
-    chatHistory,
-    sidebarOpen,
-    setSidebarOpen,
-  } = useChatContext();
-
-  const { logout } =
-    useAuth();
+  const { chatHistory, sidebarOpen, setSidebarOpen } = useChatContext();
+  const { logout } = useAuth();
 
   return (
     <motion.div
       animate={{
-        width: sidebarOpen
-          ? 280
-          : 90,
+        width: sidebarOpen ? 280 : 80,
       }}
-      className="h-screen bg-[#081028] border-r border-white/10 flex flex-col justify-between overflow-hidden"
+      className="h-screen glass-panel border-r border-white/5 flex flex-col justify-between overflow-hidden relative z-20"
     >
-
       {/* Top */}
       <div>
-
         {/* Header */}
-        <div className="p-5 border-b border-white/10 flex items-center justify-between">
-
-          {sidebarOpen && (
-            <h1 className="text-2xl font-bold leading-tight">
-              AI YouTube
-              <br />
-              Assistant
-            </h1>
-          )}
+        <div className="p-5 border-b border-white/5 flex items-center justify-between min-h-[80px]">
+          <AnimatePresence>
+            {sidebarOpen && (
+              <motion.h1 
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: "auto" }}
+                exit={{ opacity: 0, width: 0 }}
+                className="text-xl font-bold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400 whitespace-nowrap"
+              >
+                AI YouTube
+                <br />
+                Assistant
+              </motion.h1>
+            )}
+          </AnimatePresence>
 
           <button
-            onClick={() =>
-              setSidebarOpen(
-                !sidebarOpen
-              )
-            }
-            className="bg-white/10 hover:bg-white/20 p-2 rounded-xl transition-all"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="bg-white/5 hover:bg-white/10 p-2 rounded-xl transition-all hover:scale-105 active:scale-95 text-gray-400 hover:text-white"
           >
-
-            {sidebarOpen ? (
-              <PanelLeftClose
-                size={18}
-              />
-            ) : (
-              <PanelLeftOpen
-                size={18}
-              />
-            )}
-
+            {sidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
           </button>
-
         </div>
 
         {/* New Chat */}
         <div className="p-4">
-
-          <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition-all py-3 rounded-xl flex items-center justify-center gap-2 font-semibold">
-
-            <Plus size={20} />
-
-            {sidebarOpen &&
-              "New Chat"}
-
+          <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/25 transition-all py-3 rounded-xl flex items-center justify-center gap-2 font-semibold group overflow-hidden">
+            <Plus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+            <AnimatePresence>
+              {sidebarOpen && (
+                <motion.span
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: "auto" }}
+                  exit={{ opacity: 0, width: 0 }}
+                  className="whitespace-nowrap"
+                >
+                  New Chat
+                </motion.span>
+              )}
+            </AnimatePresence>
           </button>
-
         </div>
 
         {/* Chats */}
-        <div className="px-4">
-
+        <div className="px-4 mt-2">
           {sidebarOpen && (
-            <h2 className="text-sm text-gray-400 mb-4 uppercase tracking-wider">
+            <motion.h2 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-xs text-gray-500 mb-4 uppercase tracking-wider font-semibold ml-2"
+            >
               Recent Chats
-            </h2>
+            </motion.h2>
           )}
 
-          <div className="space-y-3">
-
-            {chatHistory.length ===
-              0 &&
-              sidebarOpen && (
-                <div className="text-sm text-gray-500 px-2">
-                  No chats yet
-                </div>
-              )}
-
-            {chatHistory.map(
-              (chat) => (
-
-                <motion.div
-                  whileHover={{
-                    scale: 1.02,
-                  }}
-                  key={chat.id}
-                  className="bg-white/5 hover:bg-white/10 transition-all p-4 rounded-xl cursor-pointer border border-white/5"
-                >
-
-                  <div className="flex items-center gap-3">
-
-                    <PlayCircle
-                      className="text-red-500"
-                      size={20}
-                    />
-
-                    {sidebarOpen && (
-                      <div className="overflow-hidden">
-
-                        <p className="font-medium text-sm truncate">
-                          {chat.title}
-                        </p>
-
-                        <p className="text-xs text-gray-400">
-                          Recent Chat
-                        </p>
-
-                      </div>
-                    )}
-
-                  </div>
-
-                </motion.div>
-              )
+          <div className="space-y-2">
+            {chatHistory.length === 0 && sidebarOpen && (
+              <div className="text-sm text-gray-500 px-2 italic">
+                No chats yet
+              </div>
             )}
 
+            {chatHistory.map((chat) => (
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                key={chat.id}
+                className="bg-white/5 hover:bg-white/10 transition-all p-3 rounded-xl cursor-pointer border border-transparent hover:border-white/10 flex items-center gap-3 group"
+              >
+                <div className="min-w-[40px] h-10 rounded-lg bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
+                  <PlayCircle className="text-red-400" size={20} />
+                </div>
+
+                <AnimatePresence>
+                  {sidebarOpen && (
+                    <motion.div 
+                      initial={{ opacity: 0, width: 0 }}
+                      animate={{ opacity: 1, width: "auto" }}
+                      exit={{ opacity: 0, width: 0 }}
+                      className="overflow-hidden flex-1"
+                    >
+                      <p className="font-medium text-sm truncate text-gray-200 group-hover:text-white transition-colors">
+                        {chat.title}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        Recent Chat
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
           </div>
-
         </div>
-
       </div>
 
       {/* Bottom */}
-      <div className="p-4 border-t border-white/10">
-
+      <div className="p-4 border-t border-white/5">
         <button
           onClick={logout}
-          className="w-full flex items-center gap-3 text-gray-300 hover:text-white transition-all"
+          className="w-full flex items-center justify-center sm:justify-start gap-3 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all p-3 rounded-xl group"
         >
-
-          <LogOut size={18} />
-
-          {sidebarOpen &&
-            "Logout"}
-
+          <LogOut size={18} className="group-hover:-translate-x-1 transition-transform" />
+          <AnimatePresence>
+            {sidebarOpen && (
+              <motion.span
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: "auto" }}
+                exit={{ opacity: 0, width: 0 }}
+                className="whitespace-nowrap font-medium"
+              >
+                Logout
+              </motion.span>
+            )}
+          </AnimatePresence>
         </button>
-
       </div>
-
     </motion.div>
   );
 }
